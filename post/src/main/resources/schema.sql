@@ -1,16 +1,17 @@
 CREATE TABLE IF NOT EXISTS posts (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,              -- user-serviceのID
+    id INTEGER(255) AUTO_INCREMENT PRIMARY KEY,
+    user_id INTEGER(255) NOT NULL,              -- user-serviceのID
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS likes (
-    post_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    post_id INTEGER(255) NOT NULL,
+    user_id INTEGER(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (post_id, user_id)
-);
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
