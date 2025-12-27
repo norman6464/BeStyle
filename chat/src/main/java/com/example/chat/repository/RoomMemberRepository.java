@@ -2,6 +2,7 @@ package com.example.chat.repository;
 
 import com.example.chat.entity.RoomMember;
 import com.example.chat.entity.RoomMemberId;
+import com.example.chat.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,9 +13,9 @@ import java.util.Optional;
 public interface RoomMemberRepository extends JpaRepository<RoomMember, RoomMemberId> {
 
     /**
-     * ルームIDでメンバーを検索
+     * ルームのメンバーを検索
      */
-    List<RoomMember> findByRoomId(Integer roomId);
+    List<RoomMember> findByRoom(Room room);
 
     /**
      * ユーザーIDで参加しているルームを検索
@@ -22,17 +23,17 @@ public interface RoomMemberRepository extends JpaRepository<RoomMember, RoomMemb
     List<RoomMember> findByUserId(Integer userId);
 
     /**
-     * ルームIDとユーザーIDで検索
+     * ルームとユーザーIDで検索
      */
-    Optional<RoomMember> findByRoomIdAndUserId(Integer roomId, Integer userId);
+    Optional<RoomMember> findByRoomAndUserId(Room room, Integer userId);
 
     /**
      * ルームのメンバー数をカウント
      */
-    long countByRoomId(Integer roomId);
+    long countByRoom(Room room);
 
     /**
      * ユーザーがルームに参加しているかチェック
      */
-    boolean existsByRoomIdAndUserId(Integer roomId, Integer userId);
+    boolean existsByRoomAndUserId(Room room, Integer userId);
 }

@@ -1,19 +1,27 @@
 package com.example.chat.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "room_members")
 @IdClass(RoomMemberId.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomMember {
 
     @Id
-    @Column(name = "room_id")
-    private Integer roomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Integer userId;
 
     @Column(nullable = false, updatable = false)
@@ -22,39 +30,5 @@ public class RoomMember {
     @PrePersist
     protected void onCreate() {
         joinedAt = LocalDateTime.now();
-    }
-
-    // Constructors
-    public RoomMember() {
-    }
-
-    public RoomMember(Integer roomId, Integer userId) {
-        this.roomId = roomId;
-        this.userId = userId;
-    }
-
-    // Getters and Setters
-    public Integer getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(Integer roomId) {
-        this.roomId = roomId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public LocalDateTime getJoinedAt() {
-        return joinedAt;
-    }
-
-    public void setJoinedAt(LocalDateTime joinedAt) {
-        this.joinedAt = joinedAt;
     }
 }

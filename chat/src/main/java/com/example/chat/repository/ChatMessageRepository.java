@@ -1,6 +1,7 @@
 package com.example.chat.repository;
 
 import com.example.chat.entity.ChatMessage;
+import com.example.chat.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,14 +13,14 @@ import java.util.List;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Integer> {
 
     /**
-     * ルームIDでメッセージを検索
+     * ルームのメッセージを検索
      */
-    List<ChatMessage> findByRoomId(Integer roomId);
+    List<ChatMessage> findByRoom(Room room);
 
     /**
-     * ルームIDでメッセージをページング検索（最新順）
+     * ルームのメッセージをページング検索（最新順）
      */
-    Page<ChatMessage> findByRoomIdOrderByCreatedAtDesc(Integer roomId, Pageable pageable);
+    Page<ChatMessage> findByRoomOrderByCreatedAtDesc(Room room, Pageable pageable);
 
     /**
      * 送信者IDでメッセージを検索
@@ -27,7 +28,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Intege
     List<ChatMessage> findBySenderId(Integer senderId);
 
     /**
-     * ルームIDのメッセージ数をカウント
+     * ルームのメッセージ数をカウント
      */
-    long countByRoomId(Integer roomId);
+    long countByRoom(Room room);
 }
