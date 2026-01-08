@@ -25,15 +25,70 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	/* ===============================
+	   Spring Boot 基本機能
+	   =============================== */
+
+	// Spring MVC（REST API / Webアプリケーション用）
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	compileOnly 'org.projectlombok:lombok'
+
+	// 入力値チェック（@NotNull などのバリデーション）
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+	/* ===============================
+	   データベース・永続化
+	   =============================== */
+
+	// JPA（Hibernate）を使ったDBアクセス
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// MySQL JDBC ドライバ（実行時のみ必要）
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+
+	/* ===============================
+	   Redis（セッション管理・キャッシュ）
+	   =============================== */
+
+	// Redis を使ったセッション管理
+	implementation 'org.springframework.boot:spring-boot-starter-session-data-redis'
+
+	// Redis 操作用（キャッシュ・KeyValue操作など）
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+	/* ===============================
+	   マイクロサービス・外部通信
+	   =============================== */
+
+	// OpenFeign（HTTPクライアントをインターフェースで定義）
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+
+	/* ===============================
+	   開発効率向上
+	   =============================== */
+
+	// Lombok（getter/setter, constructor 自動生成）
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+
+
+	/* ===============================
+	   テスト関連
+	   =============================== */
+
+	// JPAテスト用（@DataJpaTest など）
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+
+	// バリデーションのテストサポート
+	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+
+	// Spring MVC のテスト（MockMvcなど）
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
+	// JUnit Platform のランチャー（IDE・CI向け）
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
