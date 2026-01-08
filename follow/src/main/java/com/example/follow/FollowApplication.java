@@ -1,13 +1,13 @@
-package com.example.chat;
+package com.example.follow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ChatApplication {
+public class FollowApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ChatApplication.class, args);
+		SpringApplication.run(FollowApplication.class, args);
 	}
 
 }
