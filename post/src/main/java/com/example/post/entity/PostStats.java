@@ -14,7 +14,10 @@ import java.time.LocalDateTime;
 public class PostStats {
 
     @Id
-    @Column(name = "post_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "post_id", nullable = false, unique = true)
     private Integer postId;
 
     @Column(name = "like_count", columnDefinition = "INT DEFAULT 0")

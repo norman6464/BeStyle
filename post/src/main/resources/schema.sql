@@ -24,15 +24,18 @@ CREATE TABLE IF NOT EXISTS posts (
 
 -- 投稿統計（非正規化）
 CREATE TABLE IF NOT EXISTS post_stats (
-    post_id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    post_id INT NOT NULL,
     like_count INT DEFAULT 0,
     reply_count INT DEFAULT 0,
     repost_count INT DEFAULT 0,
     quote_count INT DEFAULT 0,
     view_count INT DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (post_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
+
 
 -- 投稿メディア
 CREATE TABLE IF NOT EXISTS post_media (
@@ -58,11 +61,12 @@ CREATE TABLE IF NOT EXISTS hashtags (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 投稿とハッシュタグの中間
+-- 投稿とハッシュタグの中間テーブル
 CREATE TABLE IF NOT EXISTS post_hashtags (
+    id INT PRIMARY KEY AUTO_INCREMENT,
     post_id INT NOT NULL,
     hashtag_id INT NOT NULL,
-    PRIMARY KEY (post_id, hashtag_id),
+    UNIQUE (post_id, hashtag_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (hashtag_id) REFERENCES hashtags(id) ON DELETE CASCADE
 );

@@ -1,14 +1,14 @@
 package com.example.post.repository;
 
 import com.example.post.entity.PostHashtag;
-import com.example.post.entity.PostHashtagId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface PostHashtagRepository extends JpaRepository<PostHashtag, PostHashtagId> {
+public interface PostHashtagRepository extends JpaRepository<PostHashtag, Integer> {
 
     /**
      * 投稿IDでハッシュタグを検索
@@ -19,4 +19,14 @@ public interface PostHashtagRepository extends JpaRepository<PostHashtag, PostHa
      * ハッシュタグIDで投稿を検索
      */
     List<PostHashtag> findByHashtagId(Integer hashtagId);
+
+    /**
+     * 投稿IDとハッシュタグIDで検索
+     */
+    Optional<PostHashtag> findByPostIdAndHashtagId(Integer postId, Integer hashtagId);
+
+    /**
+     * 投稿IDとハッシュタグIDで存在チェック
+     */
+    boolean existsByPostIdAndHashtagId(Integer postId, Integer hashtagId);
 }

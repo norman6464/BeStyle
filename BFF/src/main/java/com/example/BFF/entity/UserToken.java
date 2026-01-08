@@ -33,4 +33,9 @@ public class UserToken {
     protected void onCreate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

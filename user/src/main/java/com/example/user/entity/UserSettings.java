@@ -14,7 +14,10 @@ import java.time.LocalDateTime;
 public class UserSettings {
 
     @Id
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "user_id", nullable = false, unique = true)
     private Integer userId;
 
     @Column(length = 10)
