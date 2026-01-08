@@ -11,3 +11,12 @@
 3. **改善フィードバック：** AIが客観的なギャップを指摘。コミュニケーションの癖を修正し、一貫性のある自己表現を身につけることができます。
 
 
+
+### ローカルスタックについて
+初めてローカルスタックの使用をするのでDockerコマンドを使用する
+```bash
+# LocalStack Community Edition を docker-compose で立ち上げ
+docker pull localstack/localstack
+docker run -d -p 4566:4566 -p 4571:4571 localstack/localstack
+
+```
