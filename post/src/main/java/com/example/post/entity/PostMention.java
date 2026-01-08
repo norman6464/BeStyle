@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+@Table(name = "post_mentions", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "mentioned_user_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class PostMention {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +20,8 @@ public class Like {
     @Column(name = "post_id", nullable = false)
     private Integer postId;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "mentioned_user_id", nullable = false)
+    private Integer mentionedUserId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

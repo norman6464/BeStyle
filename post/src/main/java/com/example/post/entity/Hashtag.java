@@ -7,21 +7,21 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+@Table(name = "hashtags")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class Hashtag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "post_id", nullable = false)
-    private Integer postId;
+    @Column(nullable = false, unique = true, length = 100)
+    private String name;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "post_count", columnDefinition = "INT DEFAULT 0")
+    private Integer postCount = 0;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

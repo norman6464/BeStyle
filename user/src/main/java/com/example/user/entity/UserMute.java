@@ -1,4 +1,4 @@
-package com.example.post.entity;
+package com.example.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,21 +7,21 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+@Table(name = "user_mutes", uniqueConstraints = @UniqueConstraint(columnNames = {"muter_id", "muted_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class UserMute {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "post_id", nullable = false)
-    private Integer postId;
+    @Column(name = "muter_id", nullable = false)
+    private Integer muterId;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "muted_id", nullable = false)
+    private Integer mutedId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

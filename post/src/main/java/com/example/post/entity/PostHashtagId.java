@@ -8,8 +8,8 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LikeId implements Serializable {
+public class PostHashtagId implements Serializable {
 
     private Integer postId;
-    private Integer userId;
+    private Integer hashtagId;
 }

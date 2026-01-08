@@ -1,4 +1,4 @@
-package com.example.post.entity;
+package com.example.follow.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,36 +7,24 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "follow_requests", uniqueConstraints = @UniqueConstraint(columnNames = {"requester_id", "target_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class FollowRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    @Column(name = "requester_id", nullable = false)
+    private Integer requesterId;
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
-
-    @Column(name = "reply_to_id")
-    private Integer replyToId;
-
-    @Column(name = "repost_of_id")
-    private Integer repostOfId;
-
-    @Column(name = "quote_of_id")
-    private Integer quoteOfId;
+    @Column(name = "target_id", nullable = false)
+    private Integer targetId;
 
     @Column(length = 20)
-    private String visibility = "PUBLIC";
-
-    @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isDeleted = false;
+    private String status = "PENDING";
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

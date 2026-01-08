@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
+@Table(name = "post_bookmarks", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Like {
+public class PostBookmark {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

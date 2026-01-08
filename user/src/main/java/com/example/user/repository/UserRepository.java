@@ -10,6 +10,11 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     /**
+     * Cognitoサブでユーザーを検索
+     */
+    Optional<User> findByCognitoSub(String cognitoSub);
+
+    /**
      * ユーザー名でユーザーを検索
      */
     Optional<User> findByUsername(String username);
@@ -20,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
 
     /**
-     * ユーザーが有効かどうかを確認
+     * ステータスでユーザーを検索
      */
-    boolean existsByIdAndIsActiveTrue(Integer id);
+    Optional<User> findByIdAndStatus(Integer id, String status);
 }

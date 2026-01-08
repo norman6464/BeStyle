@@ -1,4 +1,4 @@
-package com.example.post.entity;
+package com.example.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,36 +7,30 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "user_settings")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class UserSettings {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Integer userId;
 
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    @Column(length = 10)
+    private String language = "ja";
 
-    @Column(name = "reply_to_id")
-    private Integer replyToId;
+    @Column(length = 50)
+    private String timezone = "Asia/Tokyo";
 
-    @Column(name = "repost_of_id")
-    private Integer repostOfId;
+    @Column(name = "email_notification_enabled", columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean emailNotificationEnabled = true;
 
-    @Column(name = "quote_of_id")
-    private Integer quoteOfId;
+    @Column(name = "push_notification_enabled", columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean pushNotificationEnabled = true;
 
-    @Column(length = 20)
-    private String visibility = "PUBLIC";
-
-    @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isDeleted = false;
+    @Column(name = "dm_permission", length = 20)
+    private String dmPermission = "EVERYONE";
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
