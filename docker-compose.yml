@@ -5,6 +5,98 @@
 
 services:
   # ============================================
+  # データベース（MySQL）
+  # ============================================
+  
+  # User Service用DB
+  user-db:
+    image: mysql:8.0
+    container_name: bestyle-user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: user_db
+      MYSQL_USER: bestyle
+      MYSQL_PASSWORD: bestyle123
+    ports:
+      - "3306:3306"
+    volumes:
+      - user-db-data:/var/lib/mysql
+      - ./user/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestyle-network
+
+  # Post Service用DB
+  post-db:
+    image: mysql:8.0
+    container_name: bestyle-post-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: post_db
+      MYSQL_USER: bestyle
+      MYSQL_PASSWORD: bestyle123
+    ports:
+      - "3307:3306"
+    volumes:
+      - post-db-data:/var/lib/mysql
+      - ./post/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestyle-network
+
+  # Follow Service用DB
+  follow-db:
+    image: mysql:8.0
+    container_name: bestyle-follow-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: follow_db
+      MYSQL_USER: bestyle
+      MYSQL_PASSWORD: bestyle123
+    ports:
+      - "3308:3306"
+    volumes:
+      - follow-db-data:/var/lib/mysql
+      - ./follow/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestyle-network
+
+  # ============================================
+  # Redis（キャッシュ・セッション）
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: bestyle-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestyle-network
+
+  # ============================================
   # アプリケーションサービス
   # ============================================
 
@@ -16,10 +108,9 @@ services:
     env_file:
       - .env
     environment:
-      - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
-      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
-      - COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET}
-      - AWS_REGION=${AWS_REGION}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/user_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=bestyle
+      - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
       - SERVICES_USER_SERVICE_URL=http://user-service:8081
       - SERVICES_POST_SERVICE_URL=http://post-service:8082
@@ -27,6 +118,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      redis:
+        condition: service_healthy
+      user-db:
+        condition: service_healthy
       user-service:
         condition: service_started
       post-service:
@@ -44,9 +139,17 @@ services:
     env_file:
       - .env
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/user_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=bestyle
+      - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
     ports:
       - "8081:8081"
+    depends_on:
+      user-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - bestyle-network
 
@@ -58,11 +161,19 @@ services:
     env_file:
       - .env
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://post-db:3306/post_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=bestyle
+      - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
       - SERVICES_USER_SERVICE_URL=http://user-service:8081
       - SERVICES_FOLLOW_SERVICE_URL=http://follow-service:8083
     ports:
       - "8082:8082"
+    depends_on:
+      post-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - bestyle-network
 
@@ -74,12 +185,29 @@ services:
     env_file:
       - .env
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://follow-db:3306/follow_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_USERNAME=bestyle
+      - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
       - SERVICES_USER_SERVICE_URL=http://user-service:8081
     ports:
       - "8083:8083"
+    depends_on:
+      follow-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - bestyle-network
+
+# ============================================
+# ボリューム（データ永続化）
+# ============================================
+volumes:
+  user-db-data:
+  post-db-data:
+  follow-db-data:
+  redis-data:
 
 # ============================================
 # ネットワーク
