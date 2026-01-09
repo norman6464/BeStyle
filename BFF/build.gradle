@@ -63,6 +63,14 @@ dependencies {
 	// （Googleログインなどの外部認証）
 	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
 
+	// OAuth2 Resource Server（JWTトークン検証用）
+	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+
+	// JWT処理用
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
 
 	/* ===============================
 	   データベース・永続化
@@ -100,6 +108,7 @@ dependencies {
 
 	// OAuth2クライアントのテストサポート
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client-test'
+	
 
 	// Spring Security のテスト用（@WithMockUser など）
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'

@@ -1,5 +1,6 @@
 package com.example.BFF.client;
 
+import com.example.BFF.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -7,19 +8,19 @@ import org.springframework.web.bind.annotation.*;
 public interface UserClient {
 
     @GetMapping("/api/users/{id}")
-    Object getUserById(@PathVariable("id") Integer id);
+    UserDto getUserById(@PathVariable("id") Integer id);
 
     @GetMapping("/api/users/username/{username}")
-    Object getUserByUsername(@PathVariable("username") String username);
+    UserDto getUserByUsername(@PathVariable("username") String username);
 
     @GetMapping("/api/users/cognito/{cognitoSub}")
-    Object getUserByCognitoSub(@PathVariable("cognitoSub") String cognitoSub);
+    UserDto getUserByCognitoSub(@PathVariable("cognitoSub") String cognitoSub);
 
     @PostMapping("/api/users")
-    Object createUser(@RequestBody Object userRequest);
+    UserDto createUser(@RequestBody UserDto userRequest);
 
     @PutMapping("/api/users/{id}")
-    Object updateUser(@PathVariable("id") Integer id, @RequestBody Object userRequest);
+    UserDto updateUser(@PathVariable("id") Integer id, @RequestBody UserDto userRequest);
 
     @DeleteMapping("/api/users/{id}")
     void deleteUser(@PathVariable("id") Integer id);
