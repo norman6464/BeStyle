@@ -17,8 +17,8 @@ public class UserToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id", length = 255)
-    private String userId;
+    @Column(name = "user_id" , nullable = false, unique = true)
+    private Integer userId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String accessToken;
