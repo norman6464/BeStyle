@@ -1,0 +1,89 @@
+# ============================================
+# BeStyle - docker-compose.yml
+# ローカル開発環境用（全サービス版）
+# ============================================
+
+services:
+  # ============================================
+  # アプリケーションサービス
+  # ============================================
+
+  # BFF Service
+  bff:
+    build:
+      context: ./BFF
+    container_name: bestyle-bff
+    env_file:
+      - .env
+    environment:
+      - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
+      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
+      - COGNITO_CLIENT_SECRET=${COGNITO_CLIENT_SECRET}
+      - AWS_REGION=${AWS_REGION}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SERVICES_USER_SERVICE_URL=http://user-service:8081
+      - SERVICES_POST_SERVICE_URL=http://post-service:8082
+      - SERVICES_FOLLOW_SERVICE_URL=http://follow-service:8083
+    ports:
+      - "8080:8080"
+    depends_on:
+      user-service:
+        condition: service_started
+      post-service:
+        condition: service_started
+      follow-service:
+        condition: service_started
+    networks:
+      - bestyle-network
+
+  # User Service
+  user-service:
+    build:
+      context: ./user
+    container_name: bestyle-user-service
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+    ports:
+      - "8081:8081"
+    networks:
+      - bestyle-network
+
+  # Post Service
+  post-service:
+    build:
+      context: ./post
+    container_name: bestyle-post-service
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+      - SERVICES_USER_SERVICE_URL=http://user-service:8081
+      - SERVICES_FOLLOW_SERVICE_URL=http://follow-service:8083
+    ports:
+      - "8082:8082"
+    networks:
+      - bestyle-network
+
+  # Follow Service
+  follow-service:
+    build:
+      context: ./follow
+    container_name: bestyle-follow-service
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATA_REDIS_HOST=redis
+      - SERVICES_USER_SERVICE_URL=http://user-service:8081
+    ports:
+      - "8083:8083"
+    networks:
+      - bestyle-network
+
+# ============================================
+# ネットワーク
+# ============================================
+networks:
+  bestyle-network:
+    driver: bridge

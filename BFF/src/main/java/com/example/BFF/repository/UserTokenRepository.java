@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface UserTokenRepository extends JpaRepository<UserToken, String> {
+public interface UserTokenRepository extends JpaRepository<UserToken, Integer> {
 
     /**
      * 有効期限が切れたトークンを検索

@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 public class UserToken {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @Column(name = "user_id", length = 255)
     private String userId;
 
