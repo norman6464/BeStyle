@@ -7,32 +7,27 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "likes")
-@IdClass(LikeId.class)
+@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "user_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Like {
 
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @Id
+    @Column(name = "post_id", nullable = false)
+    private Integer postId;
+
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-    }
-
-    public Like(Post post, Integer userId) {
-        this.post = post;
-        this.userId = userId;
     }
 }

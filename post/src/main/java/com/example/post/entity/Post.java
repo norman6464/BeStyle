@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "posts")
@@ -22,21 +20,38 @@ public class Post {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @Column(nullable = false, length = 255)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(length = 255)
-    private String imageUrl;
+    @Column(name = "reply_to_id")
+    private Integer replyToId;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "repost_of_id")
+    private Integer repostOfId;
+
+    @Column(name = "quote_of_id")
+    private Integer quoteOfId;
+
+    @Column(length = 20)
+    private String visibility = "PUBLIC";
+
+    @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isDeleted = false;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Like> likes = new HashSet<>();
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

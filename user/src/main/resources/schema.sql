@@ -26,17 +26,21 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- ユーザー統計（非正規化）
 CREATE TABLE IF NOT EXISTS user_stats (
-    user_id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     post_count INT DEFAULT 0,
     follower_count INT DEFAULT 0,
     following_count INT DEFAULT 0,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+
 -- ユーザー設定
 CREATE TABLE IF NOT EXISTS user_settings (
-    user_id INT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
     language VARCHAR(10) DEFAULT 'ja',
     timezone VARCHAR(50) DEFAULT 'Asia/Tokyo',
     email_notification_enabled BOOLEAN DEFAULT TRUE,
@@ -44,8 +48,10 @@ CREATE TABLE IF NOT EXISTS user_settings (
     dm_permission VARCHAR(20) DEFAULT 'EVERYONE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 -- ブロック関係
 CREATE TABLE IF NOT EXISTS user_blocks (

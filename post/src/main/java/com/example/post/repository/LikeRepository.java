@@ -1,7 +1,6 @@
 package com.example.post.repository;
 
 import com.example.post.entity.Like;
-import com.example.post.entity.LikeId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface LikeRepository extends JpaRepository<Like, LikeId> {
+public interface LikeRepository extends JpaRepository<Like, Integer> {
 
     /**
      * 投稿IDでいいねを検索

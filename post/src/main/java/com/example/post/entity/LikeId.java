@@ -10,6 +10,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class LikeId implements Serializable {
 
-    private Post post;
+    private Integer postId;
     private Integer userId;
 }
