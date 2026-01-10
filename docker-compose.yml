@@ -8,6 +8,29 @@ services:
   # データベース（MySQL）
   # ============================================
   
+  # BFF Service用DB
+  bff-db:
+    image: mysql:8.0
+    container_name: bestyle-bff-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: bff_db
+      MYSQL_USER: bestyle
+      MYSQL_PASSWORD: bestyle123
+    ports:
+      - "3305:3306"
+    volumes:
+      - bff-db-data:/var/lib/mysql
+      - ./database/bff-service/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bestyle-network
+  
   # User Service用DB
   user-db:
     image: mysql:8.0
@@ -108,7 +131,7 @@ services:
     env_file:
       - .env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://user-db:3306/user_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
+      - SPRING_DATASOURCE_URL=jdbc:mysql://bff-db:3306/bff_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8
       - SPRING_DATASOURCE_USERNAME=bestyle
       - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
@@ -120,7 +143,7 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      user-db:
+      bff-db:
         condition: service_healthy
       user-service:
         condition: service_started
@@ -204,6 +227,7 @@ services:
 # ボリューム（データ永続化）
 # ============================================
 volumes:
+  bff-db-data:
   user-db-data:
   post-db-data:
   follow-db-data:

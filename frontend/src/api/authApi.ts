@@ -1,138 +1,102 @@
 /**
- * 認証API クライアント
- * BFFの認証エンドポイントと通信
+ * 認証API
+ * BFFの /api/auth/cognito/* エンドポイントとの通信
  */
 
-const API_BASE_URL = 'http://localhost:8080/api/auth';
+import { apiClient } from './client';
+import type {
+  LoginForm,
+  SignupForm,
+  ConfirmSignupForm,
+  ForgotPasswordForm,
+  AuthResponse,
+  CurrentUser,
+} from '../types/auth';
+
+const AUTH_BASE = '/api/auth/cognito';
 
 /**
- * ログインURLを取得
+ * ログイン
  */
-export const getLoginUrl = async (): Promise<{ loginUrl: string; state: string }> => {
-  const response = await fetch(`${API_BASE_URL}/login`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to get login URL');
-  }
-  return response.json();
+export const login = async (form: LoginForm): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/login`, form);
 };
 
 /**
- * サインアップURLを取得
+ * サインアップ
  */
-export const getSignupUrl = async (): Promise<{ signupUrl: string; state: string }> => {
-  const response = await fetch(`${API_BASE_URL}/signup`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to get signup URL');
-  }
-  return response.json();
+export const signup = async (form: SignupForm): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/signup`, form);
 };
 
 /**
- * 認証コードをトークンに交換
+ * サインアップ確認（メール認証）
  */
-export const exchangeAuthCode = async (code: string, state: string): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE_URL}/callback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ code, state }),
-  });
-  return response.json();
+export const confirmSignup = async (form: ConfirmSignupForm): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/confirm`, form);
 };
 
 /**
- * 現在のユーザー情報を取得
+ * 確認コード再送信
  */
-export const getCurrentUser = async (): Promise<CurrentUserResponse> => {
-  const response = await fetch(`${API_BASE_URL}/me`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to get current user');
-  }
-  return response.json();
-};
-
-/**
- * セッションの検証
- */
-export const validateSession = async (): Promise<{ valid: boolean }> => {
-  const response = await fetch(`${API_BASE_URL}/validate`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to validate session');
-  }
-  return response.json();
+export const resendConfirmationCode = async (email: string): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/resend-code`, { email });
 };
 
 /**
  * ログアウト
  */
-export const logout = async (): Promise<LogoutResponse> => {
-  const response = await fetch(`${API_BASE_URL}/logout`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to logout');
-  }
-  return response.json();
+export const logout = async (): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/logout`);
 };
 
 /**
- * トークンのリフレッシュ
+ * パスワードリセット要求
  */
-export const refreshToken = async (): Promise<{ success: boolean; message: string }> => {
-  const response = await fetch(`${API_BASE_URL}/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-  return response.json();
+export const forgotPassword = async (email: string): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/forgot-password`, { email });
 };
 
-// 型定義
-export interface AuthResponse {
-  success: boolean;
-  message: string;
-  userId?: number;
-  username?: string;
-  email?: string;
-  displayName?: string;
-}
+/**
+ * パスワードリセット確定
+ */
+export const confirmForgotPassword = async (form: ForgotPasswordForm): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/confirm-forgot-password`, form);
+};
 
-export interface User {
-  id: number;
-  cognitoSub: string;
-  username: string;
-  email: string;
-  displayName: string;
-  bio?: string;
-  profileImageUrl?: string;
-  headerImageUrl?: string;
-  location?: string;
-  websiteUrl?: string;
-  birthDate?: string;
-  isPrivate?: boolean;
-  isVerified?: boolean;
-  status?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+/**
+ * OAuth2コールバック（Google認証等）
+ */
+export const oauthCallback = async (code: string): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/callback`, { code });
+};
 
-export interface CurrentUserResponse {
-  authenticated: boolean;
-  user: User | null;
-}
+/**
+ * トークンリフレッシュ
+ */
+export const refreshToken = async (): Promise<AuthResponse> => {
+  return apiClient.post<AuthResponse>(`${AUTH_BASE}/refresh-token`);
+};
 
-export interface LogoutResponse {
-  success: boolean;
-  message: string;
-  cognitoLogoutUrl: string;
-}
+/**
+ * 現在のユーザー情報取得
+ */
+export const getCurrentUser = async (): Promise<CurrentUser> => {
+  return apiClient.get<CurrentUser>(`${AUTH_BASE}/me`);
+};
+
+// 名前付きエクスポート
+export const authApi = {
+  login,
+  signup,
+  confirmSignup,
+  resendConfirmationCode,
+  logout,
+  forgotPassword,
+  confirmForgotPassword,
+  oauthCallback,
+  refreshToken,
+  getCurrentUser,
+};
+
+export default authApi;

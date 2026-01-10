@@ -74,6 +74,9 @@ dependencies {
 	// Nimbus JOSE + JWT（JWTデコード用）
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
 
+	// Jackson（JSON処理）
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 	/* ===============================
 	   AWS SDK（Cognito認証）
 	   =============================== */
