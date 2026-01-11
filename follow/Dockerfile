@@ -6,7 +6,7 @@ FROM gradle:8.14.3 AS build
 WORKDIR /app
 COPY . /app
 RUN  chmod +x ./gradlew
-RUN ./gradlew build -x test
+RUN ./gradlew build
 
 
 FROM eclipse-temurin:21-jdk AS production
