@@ -71,6 +71,21 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
+	// Nimbus JOSE + JWT（JWTデコード用）
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
+
+	// Jackson（JSON処理）
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+	/* ===============================
+	   AWS SDK（Cognito認証）
+	   =============================== */
+
+	// AWS SDK v2 - Cognito Identity Provider
+	implementation platform('software.amazon.awssdk:bom:2.24.0')
+	implementation 'software.amazon.awssdk:cognitoidentityprovider'
+	implementation 'software.amazon.awssdk:auth'
+
 
 	/* ===============================
 	   データベース・永続化
@@ -97,6 +112,10 @@ dependencies {
 	// Lombok（getter/setter、constructor 自動生成）
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	// バリデーション（Bean Validation / JSR-380）
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
 
 	/* ===============================
