@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import { MainLayout, AuthLayout } from './components/layout';
 import {
   HomePage,
@@ -20,10 +20,48 @@ import {
   NotFoundPage,
 } from './pages';
 import { ROUTES } from './constants/routes';
+import { useAppSelector } from './store/hooks';
 
 // 認証が必要なルートのラッパー
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 実際の認証チェックはuseRequireAuthフックで行う
+  const location = useLocation();
+  const { isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth);
+
+  // 初期化中はローディング表示
+  if (!initialized || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // 未認証の場合はログインページにリダイレクト
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.AUTH.LOGIN} state={{ from: location.pathname }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// 非認証ユーザー専用ルートのラッパー（ログイン済みならホームにリダイレクト）
+const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth);
+
+  // 初期化中はローディング表示
+  if (!initialized || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // 認証済みの場合はホームにリダイレクト
+  if (isAuthenticated) {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
+
   return <>{children}</>;
 };
 
@@ -111,17 +149,21 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: (
-      <AuthLayout>
-        <LoginPage />
-      </AuthLayout>
+      <GuestRoute>
+        <AuthLayout>
+          <LoginPage />
+        </AuthLayout>
+      </GuestRoute>
     ),
   },
   {
     path: '/signup',
     element: (
-      <AuthLayout>
-        <SignupPage />
-      </AuthLayout>
+      <GuestRoute>
+        <AuthLayout>
+          <SignupPage />
+        </AuthLayout>
+      </GuestRoute>
     ),
   },
   {
@@ -135,9 +177,11 @@ export const router = createBrowserRouter([
   {
     path: '/forgot-password',
     element: (
-      <AuthLayout>
-        <div>パスワードリセットページ（実装予定）</div>
-      </AuthLayout>
+      <GuestRoute>
+        <AuthLayout>
+          <div>パスワードリセットページ（実装予定）</div>
+        </AuthLayout>
+      </GuestRoute>
     ),
   },
 
