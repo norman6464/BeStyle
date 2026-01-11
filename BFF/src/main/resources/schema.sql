@@ -24,5 +24,5 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     id_token TEXT,                             -- IDトークン
     expires_at TIMESTAMP NOT NULL,             -- セッション有効期限
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

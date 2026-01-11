@@ -2,12 +2,11 @@ package com.example.BFF.controller;
 
 import com.example.BFF.client.UserClient;
 import com.example.BFF.config.CognitoConfig;
-import com.example.BFF.config.SessionConfig;
 import com.example.BFF.dto.UserDto;
 import com.example.BFF.dto.auth.*;
 import com.example.BFF.entity.UserSession;
-import com.example.BFF.repository.UserSessionRepository;
 import com.example.BFF.service.CognitoAuthService;
+import com.example.BFF.service.UserSessionService;
 import com.example.BFF.util.JwtUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,11 +22,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * 認証コントローラー
@@ -42,9 +39,8 @@ public class AuthController {
 
     private final CognitoAuthService cognitoAuthService;
     private final UserClient userClient;
-    private final UserSessionRepository sessionRepository;
+    private final UserSessionService userSessionService;
     private final CognitoConfig cognitoConfig;
-    private final SessionConfig sessionConfig;
     private final WebClient.Builder webClientBuilder;
 
     // -----------------------
@@ -319,10 +315,9 @@ public class AuthController {
             }
         }
 
-        // DBからセッションを削除
+        // セッションを削除
         if (sessionId != null && !sessionId.isEmpty()) {
-            sessionRepository.deleteBySessionId(sessionId);
-            log.info("✅ セッション削除成功");
+            userSessionService.deleteSessionById(sessionId);
         }
 
         // Cookieを削除
@@ -424,13 +419,8 @@ public class AuthController {
             log.info("✅ トークンリフレッシュ成功");
 
             // セッションを更新
-            if (sessionId != null) {
-                sessionRepository.findBySessionId(sessionId).ifPresent(session -> {
-                    session.setAccessToken(tokens.get("accessToken"));
-                    session.setIdToken(tokens.get("idToken"));
-                    session.setExpiresAt(LocalDateTime.now().plusHours(sessionConfig.getExpiryHours()));
-                    sessionRepository.save(session);
-                });
+            if (sessionId != null && !sessionId.isEmpty()) {
+                userSessionService.updateSession(sessionId, tokens.get("accessToken"), tokens.get("idToken"));
             }
 
             // Cookieを更新
@@ -460,7 +450,7 @@ public class AuthController {
                     .body(Map.of("error", "認証されていません"));
         }
 
-        Optional<UserSession> sessionOpt = sessionRepository.findValidSession(sessionId, LocalDateTime.now());
+        Optional<UserSession> sessionOpt = userSessionService.findValidSession(sessionId);
         
         if (sessionOpt.isEmpty()) {
             log.warn("有効なセッションがありません: sessionId={}", sessionId.substring(0, 8) + "...");
@@ -517,25 +507,7 @@ public class AuthController {
      */
     private String createSession(Integer userId, String cognitoSub, 
                                   String accessToken, String refreshToken, String idToken) {
-        String sessionId = UUID.randomUUID().toString();
-        
-        // 既存のセッションがあれば削除
-        sessionRepository.findByCognitoSub(cognitoSub).ifPresent(sessionRepository::delete);
-        
-        UserSession session = UserSession.builder()
-            .sessionId(sessionId)
-            .userId(userId)
-            .cognitoSub(cognitoSub)
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .idToken(idToken)
-            .expiresAt(LocalDateTime.now().plusHours(sessionConfig.getExpiryHours()))
-            .build();
-        
-        sessionRepository.save(session);
-        log.info("✅ セッション作成成功: sessionId={}", sessionId.substring(0, 8) + "...");
-        
-        return sessionId;
+        return userSessionService.createSession(userId, cognitoSub, accessToken, refreshToken, idToken);
     }
 
     /**
