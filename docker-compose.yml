@@ -21,7 +21,7 @@ services:
       - "3305:3306"
     volumes:
       - bff-db-data:/var/lib/mysql
-      - ./bff/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./BFF/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
