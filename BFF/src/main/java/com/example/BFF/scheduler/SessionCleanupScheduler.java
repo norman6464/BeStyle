@@ -1,6 +1,6 @@
 package com.example.BFF.scheduler;
 
-import com.example.BFF.service.AuthService;
+import com.example.BFF.service.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,16 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SessionCleanupScheduler {
 
-    private final AuthService authService;
+    private final UserSessionService userSessionService;
 
     /**
      * 1時間ごとに期限切れセッションを削除
      */
     @Scheduled(fixedRate = 3600000) // 1時間 = 3600000ms
     public void cleanupExpiredSessions() {
-        int deletedCount = authService.cleanupExpiredSessions();
-        if (deletedCount > 0) {
-            log.info("期限切れセッションを削除しました: {} 件", deletedCount);
+        try {
+            int deletedCount = userSessionService.deleteExpiredSessions();
+            if (deletedCount > 0) {
+                log.info("期限切れセッションを削除しました: {} 件", deletedCount);
+            }
+        } catch (Exception e) {
+            log.error("セッションクリーンアップ中にエラーが発生しました", e);
         }
     }
 }

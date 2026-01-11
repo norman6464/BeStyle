@@ -119,15 +119,17 @@ export const useAuth = () => {
  */
 export const useAuthInit = () => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, loading, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (!isAuthenticated && !loading) {
-      dispatch(fetchCurrentUserAsync());
+    // 初期化済み or ロード中の場合はスキップ（無限ループ防止）
+    if (initialized || loading) {
+      return;
     }
-  }, [dispatch, isAuthenticated, loading]);
+    dispatch(fetchCurrentUserAsync());
+  }, [dispatch, initialized, loading]);
 
-  return { isAuthenticated, loading };
+  return { isAuthenticated, loading, initialized };
 };
 
 /**

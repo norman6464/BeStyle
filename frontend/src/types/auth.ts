@@ -53,4 +53,5 @@ export interface AuthState {
   user: CurrentUser | null;
   loading: boolean;
   error: string | null;
+  initialized: boolean;
 }
