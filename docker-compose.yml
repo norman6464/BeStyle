@@ -135,9 +135,9 @@ services:
       - SPRING_DATASOURCE_USERNAME=bestyle
       - SPRING_DATASOURCE_PASSWORD=bestyle123
       - SPRING_DATA_REDIS_HOST=redis
-      - SERVICES_USER_SERVICE_URL=http://user-service:8081
-      - SERVICES_POST_SERVICE_URL=http://post-service:8082
-      - SERVICES_FOLLOW_SERVICE_URL=http://follow-service:8083
+      - SERVICES_USER_URL=http://user-service:8081
+      - SERVICES_POST_URL=http://post-service:8082
+      - SERVICES_FOLLOW_URL=http://follow-service:8083
     ports:
       - "8080:8080"
     depends_on:

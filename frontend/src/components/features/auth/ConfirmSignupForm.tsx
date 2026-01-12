@@ -60,7 +60,7 @@ export const ConfirmSignupForm: React.FC = () => {
 
     await confirmSignup({
       email: formData.email,
-      confirmationCode: formData.confirmationCode,
+      code: formData.confirmationCode,
     });
   };
 

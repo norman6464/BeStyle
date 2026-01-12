@@ -54,7 +54,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
         // CookieからセッションIDを取得
         String sessionId = getSessionIdFromCookie(request);
 
-        if (sessionId != null) {
+        if (sessionId != null && !sessionId.isEmpty()) {
             // セッションを検証
             Optional<UserSession> sessionOpt = sessionRepository
                     .findValidSession(sessionId, LocalDateTime.now());

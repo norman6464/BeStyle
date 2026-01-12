@@ -26,7 +26,9 @@ export const getPostsByUserId = async (userId: number): Promise<Post[]> => {
  * タイムライン取得
  */
 export const getTimeline = async (page = 0, size = 20): Promise<Post[]> => {
-  return apiClient.get<Post[]>(`${POST_BASE}/timeline`, { page, size });
+  const response = await apiClient.get<any>(`${POST_BASE}/timeline`, { page, size });
+  // Spring BootのPageオブジェクトの場合、contentプロパティから配列を取得
+  return Array.isArray(response) ? response : (response.content || []);
 };
 
 /**

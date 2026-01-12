@@ -5,6 +5,8 @@ import com.example.post.entity.PostStats;
 import com.example.post.repository.PostRepository;
 import com.example.post.repository.PostStatsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +76,13 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("投稿が見つかりません"));
         post.setIsDeleted(true);
         postRepository.save(post);
+    }
+
+    /**
+     * タイムラインを取得（全投稿の新しい順）
+     */
+    public Page<Post> getTimeline(Pageable pageable) {
+        return postRepository.findByIsDeletedFalseOrderByCreatedAtDesc(pageable);
     }
 
     /**

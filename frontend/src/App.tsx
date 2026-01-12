@@ -12,9 +12,10 @@ import { useAuthInit } from './hooks/useAuth';
 
 // 認証初期化コンポーネント
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { loading } = useAuthInit();
+  const { loading, initialized } = useAuthInit();
 
-  if (loading) {
+  // 初期化完了まで待つ
+  if (!initialized && loading) {
     return <Loading fullScreen message="認証情報を確認中..." />;
   }
 

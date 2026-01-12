@@ -3,6 +3,9 @@ package com.example.post.controller;
 import com.example.post.entity.Post;
 import com.example.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,15 @@ import java.util.Optional;
 public class PostController {
 
     private final PostService postService;
+
+    /**
+     * タイムラインを取得
+     */
+    @GetMapping("/timeline")
+    public ResponseEntity<Page<Post>> getTimeline(@PageableDefault(size = 20) Pageable pageable) {
+        Page<Post> timeline = postService.getTimeline(pageable);
+        return ResponseEntity.ok(timeline);
+    }
 
     /**
      * 投稿をIDで取得

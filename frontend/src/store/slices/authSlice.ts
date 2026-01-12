@@ -14,6 +14,7 @@ const initialState: AuthState = {
   user: null,
   loading: false,
   error: null,
+  initialized: false,
 };
 
 // 非同期アクション: ログイン
@@ -208,12 +209,14 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload;
+        state.initialized = true;
       })
       .addCase(fetchCurrentUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
         state.error = action.payload as string;
+        state.initialized = true;
       });
 
     // OAuthコールバック

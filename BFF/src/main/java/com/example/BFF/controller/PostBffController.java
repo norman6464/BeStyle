@@ -29,6 +29,22 @@ public class PostBffController {
     private final JwtTokenUtil jwtTokenUtil;
 
     /**
+     * タイムラインを取得
+     */
+    @GetMapping("/timeline")
+    public ResponseEntity<Object> getTimeline(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        try {
+            Object timeline = postClient.getTimeline(page, size);
+            return ResponseEntity.ok(timeline);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
      * 投稿をIDで取得
      */
     @GetMapping("/{id}")

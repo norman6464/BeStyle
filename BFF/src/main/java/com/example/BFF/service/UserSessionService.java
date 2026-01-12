@@ -111,10 +111,11 @@ public class UserSessionService {
      */
     @Transactional
     public int deleteExpiredSessions() {
-        // 期限切れセッションを削除するロジック
-        // 必要に応じてリポジトリメソッドを追加
-        log.info("✅ 期限切れセッションをクリーンアップ");
-        return 0;
+        int deletedCount = sessionRepository.deleteExpiredSessions(LocalDateTime.now());
+        if (deletedCount > 0) {
+            log.info("✅ 期限切れセッションをクリーンアップ: {} 件削除", deletedCount);
+        }
+        return deletedCount;
     }
 
     /**

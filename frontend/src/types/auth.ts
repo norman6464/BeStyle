@@ -19,7 +19,7 @@ export interface SignupForm {
 // サインアップ確認フォーム
 export interface ConfirmSignupForm {
   email: string;
-  confirmationCode: string;
+  code: string;
 }
 
 // パスワードリセットフォーム
@@ -53,4 +53,5 @@ export interface AuthState {
   user: CurrentUser | null;
   loading: boolean;
   error: string | null;
+  initialized: boolean;
 }
