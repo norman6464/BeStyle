@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 
 /**
  * BFF側の投稿コントローラー
@@ -69,19 +69,18 @@ public class PostBffController {
                 }
                 
                 // ページ情報を保持したまま返す
-                Map<String, Object> response = Map.of(
-                    "content", postsWithUsers,
-                    "pageable", timelineNode.get("pageable"),
-                    "totalPages", timelineNode.get("totalPages"),
-                    "totalElements", timelineNode.get("totalElements"),
-                    "last", timelineNode.get("last"),
-                    "size", timelineNode.get("size"),
-                    "number", timelineNode.get("number"),
-                    "sort", timelineNode.get("sort"),
-                    "numberOfElements", timelineNode.get("numberOfElements"),
-                    "first", timelineNode.get("first"),
-                    "empty", timelineNode.get("empty")
-                );
+                Map<String, Object> response = new HashMap<>();
+                response.put("content", postsWithUsers);
+                response.put("pageable", timelineNode.get("pageable"));
+                response.put("totalPages", timelineNode.get("totalPages"));
+                response.put("totalElements", timelineNode.get("totalElements"));
+                response.put("last", timelineNode.get("last"));
+                response.put("size", timelineNode.get("size"));
+                response.put("number", timelineNode.get("number"));
+                response.put("sort", timelineNode.get("sort"));
+                response.put("numberOfElements", timelineNode.get("numberOfElements"));
+                response.put("first", timelineNode.get("first"));
+                response.put("empty", timelineNode.get("empty"));
                 
                 return ResponseEntity.ok(response);
             }
