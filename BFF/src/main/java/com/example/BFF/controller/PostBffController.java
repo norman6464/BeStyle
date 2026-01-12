@@ -4,7 +4,11 @@ import com.example.BFF.client.PostClient;
 import com.example.BFF.client.UserClient;
 import com.example.BFF.dto.CreatePostRequest;
 import com.example.BFF.dto.PostDto;
+import com.example.BFF.dto.PostResponseDto;
+import com.example.BFF.dto.UserDto;
 import com.example.BFF.filter.SessionAuthenticationFilter.SessionUserPrincipal;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +16,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * BFF側の投稿コントローラー
@@ -26,9 +32,10 @@ public class PostBffController {
 
     private final PostClient postClient;
     private final UserClient userClient;
+    private final ObjectMapper objectMapper;
 
     /**
-     * タイムラインを取得
+     * タイムラインを取得（ユーザー情報を含む）
      */
     @GetMapping("/timeline")
     public ResponseEntity<Object> getTimeline(
@@ -36,6 +43,49 @@ public class PostBffController {
             @RequestParam(defaultValue = "20") int size) {
         try {
             Object timeline = postClient.getTimeline(page, size);
+            
+            // タイムラインのレスポンスをパース
+            JsonNode timelineNode = objectMapper.valueToTree(timeline);
+            JsonNode contentNode = timelineNode.get("content");
+            
+            if (contentNode != null && contentNode.isArray()) {
+                List<PostResponseDto> postsWithUsers = new ArrayList<>();
+                
+                for (JsonNode postNode : contentNode) {
+                    PostDto post = objectMapper.treeToValue(postNode, PostDto.class);
+                    
+                    // ユーザー情報を取得
+                    UserDto user = null;
+                    try {
+                        if (post.getUserId() != null) {
+                            user = userClient.getUserById(post.getUserId());
+                        }
+                    } catch (Exception e) {
+                        // ユーザーが見つからない場合はnullのまま
+                        System.err.println("Failed to fetch user " + post.getUserId() + ": " + e.getMessage());
+                    }
+                    
+                    postsWithUsers.add(PostResponseDto.from(post, user));
+                }
+                
+                // ページ情報を保持したまま返す
+                Map<String, Object> response = Map.of(
+                    "content", postsWithUsers,
+                    "pageable", timelineNode.get("pageable"),
+                    "totalPages", timelineNode.get("totalPages"),
+                    "totalElements", timelineNode.get("totalElements"),
+                    "last", timelineNode.get("last"),
+                    "size", timelineNode.get("size"),
+                    "number", timelineNode.get("number"),
+                    "sort", timelineNode.get("sort"),
+                    "numberOfElements", timelineNode.get("numberOfElements"),
+                    "first", timelineNode.get("first"),
+                    "empty", timelineNode.get("empty")
+                );
+                
+                return ResponseEntity.ok(response);
+            }
+            
             return ResponseEntity.ok(timeline);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,10 +120,10 @@ public class PostBffController {
     }
 
     /**
-     * 投稿を作成
+     * 投稿を作成（ユーザー情報を含む）
      */
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody CreatePostRequest request) {
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody CreatePostRequest request) {
         // セッションからユーザーIDを取得
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
@@ -93,7 +143,17 @@ public class PostBffController {
             postDto.setVisibility(request.getVisibility() != null ? request.getVisibility() : "PUBLIC");
 
             PostDto createdPost = postClient.createPost(postDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+            
+            // ユーザー情報を取得して結合
+            UserDto user = null;
+            try {
+                user = userClient.getUserById(userId);
+            } catch (Exception e) {
+                System.err.println("Failed to fetch user " + userId + ": " + e.getMessage());
+            }
+            
+            PostResponseDto response = PostResponseDto.from(createdPost, user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
