@@ -48,6 +48,12 @@ public class Post {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (isDeleted == null) {
+            isDeleted = false;
+        }
+        if (visibility == null) {
+            visibility = "PUBLIC";
+        }
     }
 
     @PreUpdate
