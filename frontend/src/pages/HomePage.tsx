@@ -4,7 +4,7 @@
 
 import React, { useCallback } from 'react';
 import { useAppDispatch } from '../store/hooks';
-import { addPost as addPostToTimeline } from '../store/slices/timelineSlice';
+import { fetchTimelineAsync } from '../store/slices/timelineSlice';
 import { CreatePostForm, Timeline } from '../components/features';
 import { postApi } from '../api/postApi';
 
@@ -14,8 +14,9 @@ export const HomePage: React.FC = () => {
   const handleCreatePost = useCallback(
     async (content: string, _imageFile?: File) => {
       // TODO: 画像アップロード処理を実装
-      const post = await postApi.createPost({ content });
-      dispatch(addPostToTimeline(post));
+      await postApi.createPost({ content });
+      // 投稿後にタイムラインをリフレッシュ
+      dispatch(fetchTimelineAsync({ page: 0, refresh: true }));
     },
     [dispatch]
   );
