@@ -95,11 +95,11 @@ export const SignupForm: React.FC = () => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <h2 className="text-2xl font-bold text-center text-gray-900">新規登録</h2>
 
-      {error && (
+      {/* {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{error}</p>
         </div>
-      )}
+      )} */}
 
       <Input
         type="text"

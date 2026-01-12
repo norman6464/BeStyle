@@ -19,7 +19,7 @@ export interface SignupForm {
 // サインアップ確認フォーム
 export interface ConfirmSignupForm {
   email: string;
-  confirmationCode: string;
+  code: string;
 }
 
 // パスワードリセットフォーム
