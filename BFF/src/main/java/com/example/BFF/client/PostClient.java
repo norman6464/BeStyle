@@ -10,6 +10,9 @@ import java.util.Map;
 @FeignClient(name = "post", url = "${services.post.url:http://localhost:8082}")
 public interface PostClient {
 
+    @GetMapping("/api/posts/timeline")
+    Object getTimeline(@RequestParam("page") int page, @RequestParam("size") int size);
+
     @GetMapping("/api/posts/{id}")
     PostDto getPostById(@PathVariable("id") Integer id);
 

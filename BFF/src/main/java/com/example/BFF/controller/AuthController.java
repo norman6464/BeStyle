@@ -498,6 +498,7 @@ public class AuthController {
             newUser.setEmail(email);
             newUser.setUsername(email); // 初期値としてメールアドレスを設定
             newUser.setDisplayName(name != null ? name : email.split("@")[0]);
+            newUser.setStatus("ACTIVE");
             return userClient.createUser(newUser);
         }
     }
