@@ -54,6 +54,21 @@ public class UserController {
         try {
             User createdUser = userService.createUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // ユニーク制約違反の場合、既存ユーザーを返す
+            if (e.getMessage().contains("username")) {
+                Optional<User> existingUser = userService.getUserByUsername(user.getUsername());
+                if (existingUser.isPresent()) {
+                    return ResponseEntity.ok(existingUser.get());
+                }
+            }
+            if (e.getMessage().contains("email")) {
+                Optional<User> existingUser = userService.getUserByEmail(user.getEmail());
+                if (existingUser.isPresent()) {
+                    return ResponseEntity.ok(existingUser.get());
+                }
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
