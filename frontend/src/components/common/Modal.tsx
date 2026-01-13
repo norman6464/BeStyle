@@ -70,30 +70,36 @@ export const Modal: React.FC<ModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
+      {/* オーバーレイ背景 */}
+      <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" />
+      
+      {/* モーダル本体 */}
       <div
         className={`
-          ${sizeClasses[size]} w-full bg-white rounded-xl shadow-xl
+          ${sizeClasses[size]} w-full relative
+          bg-white/95 backdrop-blur-xl rounded-2xl 
+          shadow-2xl shadow-gray-900/20 border border-gray-200/50
           animate-scale-in overflow-hidden
         `}
       >
         {/* ヘッダー */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+              <h2 id="modal-title" className="text-xl font-bold text-gray-900">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+                className="p-2 text-gray-400 hover:text-gray-600 transition-all duration-200 rounded-xl hover:bg-gray-100 hover:scale-110 active:scale-95"
                 aria-label="閉じる"
               >
                 <svg
@@ -115,11 +121,13 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* コンテンツ */}
-        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">{children}</div>
+        <div className="px-6 py-5 max-h-[70vh] overflow-y-auto">{children}</div>
 
         {/* フッター */}
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">{footer}</div>
+          <div className="px-6 py-4 border-t border-gray-100 bg-gradient-to-b from-gray-50/50 to-gray-100/50">
+            {footer}
+          </div>
         )}
       </div>
     </div>,

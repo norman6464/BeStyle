@@ -30,8 +30,14 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   // 初期化中はローディング表示
   if (!initialized || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex flex-col items-center space-y-4 animate-fade-in">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-4 border-brand-200 border-t-brand-500 animate-spin"></div>
+            <div className="absolute inset-0 w-12 h-12 rounded-full border-4 border-transparent border-t-accent-500 animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }}></div>
+          </div>
+          <p className="text-sm font-medium text-gray-500">読み込み中...</p>
+        </div>
       </div>
     );
   }
@@ -51,8 +57,14 @@ const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // 初期化中はローディング表示
   if (!initialized || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex flex-col items-center space-y-4 animate-fade-in">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full border-4 border-brand-200 border-t-brand-500 animate-spin"></div>
+            <div className="absolute inset-0 w-12 h-12 rounded-full border-4 border-transparent border-t-accent-500 animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }}></div>
+          </div>
+          <p className="text-sm font-medium text-gray-500">読み込み中...</p>
+        </div>
       </div>
     );
   }

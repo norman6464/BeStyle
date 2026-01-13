@@ -4,16 +4,22 @@ import com.example.BFF.client.PostClient;
 import com.example.BFF.client.UserClient;
 import com.example.BFF.dto.CreatePostRequest;
 import com.example.BFF.dto.PostDto;
+import com.example.BFF.dto.PostResponseDto;
 import com.example.BFF.dto.UserDto;
-import com.example.BFF.util.JwtTokenUtil;
+import com.example.BFF.filter.SessionAuthenticationFilter.SessionUserPrincipal;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.HashMap;
 
 /**
  * BFF側の投稿コントローラー
@@ -26,10 +32,10 @@ public class PostBffController {
 
     private final PostClient postClient;
     private final UserClient userClient;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final ObjectMapper objectMapper;
 
     /**
-     * タイムラインを取得
+     * タイムラインを取得（ユーザー情報を含む）
      */
     @GetMapping("/timeline")
     public ResponseEntity<Object> getTimeline(
@@ -37,6 +43,48 @@ public class PostBffController {
             @RequestParam(defaultValue = "20") int size) {
         try {
             Object timeline = postClient.getTimeline(page, size);
+            
+            // タイムラインのレスポンスをパース
+            JsonNode timelineNode = objectMapper.valueToTree(timeline);
+            JsonNode contentNode = timelineNode.get("content");
+            
+            if (contentNode != null && contentNode.isArray()) {
+                List<PostResponseDto> postsWithUsers = new ArrayList<>();
+                
+                for (JsonNode postNode : contentNode) {
+                    PostDto post = objectMapper.treeToValue(postNode, PostDto.class);
+                    
+                    // ユーザー情報を取得
+                    UserDto user = null;
+                    try {
+                        if (post.getUserId() != null) {
+                            user = userClient.getUserById(post.getUserId());
+                        }
+                    } catch (Exception e) {
+                        // ユーザーが見つからない場合はnullのまま
+                        System.err.println("Failed to fetch user " + post.getUserId() + ": " + e.getMessage());
+                    }
+                    
+                    postsWithUsers.add(PostResponseDto.from(post, user));
+                }
+                
+                // ページ情報を保持したまま返す
+                Map<String, Object> response = new HashMap<>();
+                response.put("content", postsWithUsers);
+                response.put("pageable", timelineNode.get("pageable"));
+                response.put("totalPages", timelineNode.get("totalPages"));
+                response.put("totalElements", timelineNode.get("totalElements"));
+                response.put("last", timelineNode.get("last"));
+                response.put("size", timelineNode.get("size"));
+                response.put("number", timelineNode.get("number"));
+                response.put("sort", timelineNode.get("sort"));
+                response.put("numberOfElements", timelineNode.get("numberOfElements"));
+                response.put("first", timelineNode.get("first"));
+                response.put("empty", timelineNode.get("empty"));
+                
+                return ResponseEntity.ok(response);
+            }
+            
             return ResponseEntity.ok(timeline);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,22 +119,22 @@ public class PostBffController {
     }
 
     /**
-     * 投稿を作成
+     * 投稿を作成（ユーザー情報を含む）
      */
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody CreatePostRequest request) {
-        // JWTトークンからユーザーIDを取得
-        Optional<String> cognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (cognitoSub.isEmpty()) {
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody CreatePostRequest request) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
-            // Cognito Subからユーザー情報を取得してuserIdを取得
-            UserDto user = userClient.getUserByCognitoSub(cognitoSub.get());
-            
             PostDto postDto = new PostDto();
-            postDto.setUserId(user.getId());
+            postDto.setUserId(userId);
             postDto.setContent(request.getContent());
             postDto.setReplyToId(request.getReplyToId());
             postDto.setRepostOfId(request.getRepostOfId());
@@ -94,7 +142,17 @@ public class PostBffController {
             postDto.setVisibility(request.getVisibility() != null ? request.getVisibility() : "PUBLIC");
 
             PostDto createdPost = postClient.createPost(postDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+            
+            // ユーザー情報を取得して結合
+            UserDto user = null;
+            try {
+                user = userClient.getUserById(userId);
+            } catch (Exception e) {
+                System.err.println("Failed to fetch user " + userId + ": " + e.getMessage());
+            }
+            
+            PostResponseDto response = PostResponseDto.from(createdPost, user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -105,17 +163,19 @@ public class PostBffController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<PostDto> updatePost(@PathVariable Integer id, @RequestBody PostDto postDto) {
-        // 認可チェック: 自分の投稿のみ更新可能
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
             PostDto existingPost = postClient.getPostById(id);
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
             
-            if (!existingPost.getUserId().equals(user.getId())) {
+            if (!existingPost.getUserId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -131,17 +191,19 @@ public class PostBffController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Integer id) {
-        // 認可チェック: 自分の投稿のみ削除可能
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
             PostDto existingPost = postClient.getPostById(id);
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
             
-            if (!existingPost.getUserId().equals(user.getId())) {
+            if (!existingPost.getUserId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -157,14 +219,17 @@ public class PostBffController {
      */
     @PostMapping("/{postId}/likes")
     public ResponseEntity<Object> likePost(@PathVariable Integer postId) {
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
-            Map<String, Integer> likeRequest = Map.of("userId", user.getId());
+            Map<String, Integer> likeRequest = Map.of("userId", userId);
             Object result = postClient.likePost(postId, likeRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
@@ -177,14 +242,17 @@ public class PostBffController {
      */
     @DeleteMapping("/{postId}/likes")
     public ResponseEntity<Void> unlikePost(@PathVariable Integer postId) {
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
-            postClient.unlikePost(postId, user.getId());
+            postClient.unlikePost(postId, userId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -196,14 +264,17 @@ public class PostBffController {
      */
     @PostMapping("/{postId}/bookmarks")
     public ResponseEntity<Object> bookmarkPost(@PathVariable Integer postId) {
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
-            Map<String, Integer> bookmarkRequest = Map.of("userId", user.getId());
+            Map<String, Integer> bookmarkRequest = Map.of("userId", userId);
             Object result = postClient.bookmarkPost(postId, bookmarkRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
@@ -216,14 +287,17 @@ public class PostBffController {
      */
     @DeleteMapping("/{postId}/bookmarks")
     public ResponseEntity<Void> unbookmarkPost(@PathVariable Integer postId) {
-        Optional<String> currentCognitoSub = jwtTokenUtil.getCurrentUserId();
-        if (currentCognitoSub.isEmpty()) {
+        // セッションからユーザーIDを取得
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SessionUserPrincipal)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        SessionUserPrincipal principal = (SessionUserPrincipal) authentication.getPrincipal();
+        Integer userId = principal.userId();
+
         try {
-            UserDto user = userClient.getUserByCognitoSub(currentCognitoSub.get());
-            postClient.unbookmarkPost(postId, user.getId());
+            postClient.unbookmarkPost(postId, userId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

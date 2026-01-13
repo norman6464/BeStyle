@@ -76,6 +76,9 @@ dependencies {
 
 	// Jackson（JSON処理）
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	
+	// Jackson Java 8 日時型サポート
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 	/* ===============================
 	   AWS SDK（Cognito認証）

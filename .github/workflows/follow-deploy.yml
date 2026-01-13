@@ -1,31 +1,27 @@
-name: Deploy BFF Service to ECS
+name: Deploy Follow Service to ECS
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "BFF/**"
-      - ".aws/task-definition-bff.json"
-      - ".github/workflows/BFF-deploy.yml"
+      - "follow/**"
+      - ".aws/task-definition-follow.json"
+      - ".github/workflows/follow-deploy.yml"
   pull_request:
     branches: ["main"]
     types: [closed]
     paths:
-      - "BFF/**"
-      - ".aws/task-definition-bff.json"
-      - ".github/workflows/BFF-deploy.yml"
-  workflow_run:
-    workflows: ["Deploy User Service to ECS", "Deploy Post Service to ECS", "Deploy Follow Service to ECS"]
-    types:
-      - completed
+      - "follow/**"
+      - ".aws/task-definition-follow.json"
+      - ".github/workflows/follow-deploy.yml"
     
 env:
   AWS_REGION: ap-northeast-1
-  ECS_SERVICE: bestyle-bff-service
+  ECS_SERVICE: bestyle-follow-service
   ECS_CLUSTER: bestyle-cluster
-  ECS_TASK_DEFINITION: .aws/task-definition-bff.json
-  CONTAINER_NAME: bestyle-bff
-  ECR_REPOSITORY: bestyle-bff
+  ECS_TASK_DEFINITION: .aws/task-definition-follow.json
+  CONTAINER_NAME: bestyle-follow
+  ECR_REPOSITORY: bestyle-follow
 
 permissions:
   contents: read
@@ -37,7 +33,7 @@ jobs:
     timeout-minutes: 15
     defaults:
       run:
-        working-directory: BFF
+        working-directory: follow
     
     outputs:
       image: ${{ steps.build-image.outputs.image }}
@@ -94,18 +90,10 @@ jobs:
           image: ${{ needs.build-and-push.outputs.image }}
           environment-variables: |
             SPRING_PROFILES_ACTIVE=prod
-            SERVER_PORT=8080
-            SPRING_DATASOURCE_URL=${{ secrets.BFF_DB_URL }}
-            SPRING_DATASOURCE_USERNAME=${{ secrets.BFF_DB_USERNAME }}
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.BFF_DB_PASSWORD }}
-            SERVICES_USER_URL=${{ secrets.USER_SERVICE_URL }}
-            SERVICES_POST_URL=${{ secrets.POST_SERVICE_URL }}
-            SERVICES_FOLLOW_URL=${{ secrets.FOLLOW_SERVICE_URL }}
-            COGNITO_CLIENT_ID=${{ secrets.COGNITO_CLIENT_ID }}
-            COGNITO_CLIENT_SECRET=${{ secrets.COGNITO_CLIENT_SECRET }}
-            COGNITO_REDIRECT_URI=${{ secrets.COGNITO_REDIRECT_URI }}
-            COGNITO_TOKEN_URI=${{ secrets.COGNITO_TOKEN_URI }}
-            COGNITO_JWK_SET_URI=${{ secrets.COGNITO_JWK_SET_URI }}
+            SERVER_PORT=8083
+            SPRING_DATASOURCE_URL=${{ secrets.FOLLOW_DB_URL }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.FOLLOW_DB_USERNAME }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.FOLLOW_DB_PASSWORD }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
