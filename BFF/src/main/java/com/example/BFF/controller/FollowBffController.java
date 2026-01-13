@@ -3,7 +3,6 @@ package com.example.BFF.controller;
 import com.example.BFF.client.FollowClient;
 import com.example.BFF.client.UserClient;
 import com.example.BFF.dto.FollowDto;
-import com.example.BFF.dto.FollowRequestDto;
 import com.example.BFF.dto.UserDto;
 import com.example.BFF.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;

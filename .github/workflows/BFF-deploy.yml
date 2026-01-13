@@ -5,6 +5,9 @@ on:
     branches: ["main"]
     paths:
       - "BFF/**"
+      - "user/**"
+      - "post/**"
+      - "follow/**"
       - ".aws/task-definition-bff.json"
       - ".github/workflows/BFF-deploy.yml"
   pull_request:
