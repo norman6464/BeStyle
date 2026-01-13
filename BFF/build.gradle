@@ -107,6 +107,11 @@ dependencies {
 	// OpenFeign（HTTPクライアントをインターフェースで定義）
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+	/* ===============================
+	   モニタリング・運用
+	   =============================== */
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 
 	/* ===============================
 	   開発効率向上
