@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS posts (
     FOREIGN KEY (reply_to_id) REFERENCES posts(id) ON DELETE SET NULL,
     FOREIGN KEY (repost_of_id) REFERENCES posts(id) ON DELETE SET NULL,
     FOREIGN KEY (quote_of_id) REFERENCES posts(id) ON DELETE SET NULL
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 投稿統計（非正規化）
 CREATE TABLE IF NOT EXISTS post_stats (
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS post_stats (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (post_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- 投稿メディア
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS post_media (
     display_order INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ハッシュタグ
 CREATE TABLE IF NOT EXISTS hashtags (
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS hashtags (
     name VARCHAR(100) UNIQUE NOT NULL,
     post_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 投稿とハッシュタグの中間テーブル
 CREATE TABLE IF NOT EXISTS post_hashtags (
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS post_hashtags (
     UNIQUE (post_id, hashtag_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (hashtag_id) REFERENCES hashtags(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- いいね
 CREATE TABLE IF NOT EXISTS post_likes (
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS post_likes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ブックマーク
 CREATE TABLE IF NOT EXISTS post_bookmarks (
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS post_bookmarks (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (post_id, user_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- メンション
 CREATE TABLE IF NOT EXISTS post_mentions (
@@ -99,4 +99,4 @@ CREATE TABLE IF NOT EXISTS post_mentions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (post_id, mentioned_user_id),
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

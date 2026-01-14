@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS users (
     is_verified BOOLEAN DEFAULT FALSE,
     status VARCHAR(20) DEFAULT 'ACTIVE',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ユーザー統計（非正規化）
 CREATE TABLE IF NOT EXISTS user_stats (
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS user_stats (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ユーザー設定
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- ブロック関係
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS user_blocks (
     UNIQUE (blocker_id, blocked_id),
     FOREIGN KEY (blocker_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (blocked_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ミュート関係
 CREATE TABLE IF NOT EXISTS user_mutes (
@@ -73,4 +73,4 @@ CREATE TABLE IF NOT EXISTS user_mutes (
     UNIQUE (muter_id, muted_id),
     FOREIGN KEY (muter_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (muted_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,6 +1,5 @@
 package com.example.BFF.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,14 +18,5 @@ public class WebClientConfig {
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder();
-    }
-
-    /**
-     * ObjectMapper Bean
-     * JSON のシリアライズ/デシリアライズに使用
-     */
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 }

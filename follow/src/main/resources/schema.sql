@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS follows (
     status VARCHAR(20) DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (follower_id, following_id)
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- フォローリクエスト（非公開アカウント用）
 CREATE TABLE IF NOT EXISTS follow_requests (
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS follow_requests (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE (requester_id, target_id)
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- フォロー履歴
 CREATE TABLE IF NOT EXISTS follow_history (
@@ -31,4 +31,4 @@ CREATE TABLE IF NOT EXISTS follow_history (
     following_id INT NOT NULL,
     action VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
