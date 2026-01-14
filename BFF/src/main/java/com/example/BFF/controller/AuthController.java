@@ -520,37 +520,37 @@ public class AuthController {
         // アクセストークン Cookie
         ResponseCookie accessCookie = ResponseCookie.from("ACCESS_TOKEN", accessToken)
             .httpOnly(true)
-            .secure(false) // 開発環境: false、本番環境: true
+            .secure(true) // 開発環境: false、本番環境: true
             .path("/")
             .maxAge(60 * 60 * 2) // 2時間
-            .sameSite("Lax") // 開発環境: Lax、本番環境: None
+            .sameSite("None") // 開発環境: Lax、本番環境: None
             .build();
 
         // リフレッシュトークン Cookie
         ResponseCookie refreshCookie = ResponseCookie.from("REFRESH_TOKEN", refreshToken)
             .httpOnly(true)
-            .secure(false)
+            .secure(true)
             .path("/")
             .maxAge(60 * 60 * 24 * 7) // 7日
-            .sameSite("Lax")
+            .sameSite("None")
             .build();
 
         // メール Cookie
         ResponseCookie emailCookie = ResponseCookie.from("EMAIL", email)
             .httpOnly(true)
-            .secure(false)
+            .secure(true)
             .path("/")
             .maxAge(60 * 60 * 24 * 7)
-            .sameSite("Lax")
+            .sameSite("None")
             .build();
 
         // セッションID Cookie
         ResponseCookie sessionCookie = ResponseCookie.from("BESTYLE_SESSION", sessionId)
             .httpOnly(true)
-            .secure(false)
+            .secure(true)
             .path("/")
             .maxAge(60 * 60 * 24 * 7)
-            .sameSite("Lax")
+            .sameSite("None")
             .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -568,10 +568,10 @@ public class AuthController {
         for (String name : cookieNames) {
             ResponseCookie cookie = ResponseCookie.from(name, "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         }
