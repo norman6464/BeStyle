@@ -18,7 +18,7 @@ on:
 env:
   AWS_REGION: ap-northeast-1
   ECS_SERVICE: bestyle-post-service
-  ECS_CLUSTER: bestyle-cluster
+  ECS_CLUSTER: fre-style-cluster
   ECS_TASK_DEFINITION: .aws/task-definition-post.json
   CONTAINER_NAME: bestyle-post
   ECR_REPOSITORY: bestyle-post

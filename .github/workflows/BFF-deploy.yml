@@ -25,7 +25,7 @@ on:
 env:
   AWS_REGION: ap-northeast-1
   ECS_SERVICE: bestyle-bff-service
-  ECS_CLUSTER: bestyle-cluster
+  ECS_CLUSTER: fre-style-cluster
   ECS_TASK_DEFINITION: .aws/task-definition-bff.json
   CONTAINER_NAME: bestyle-bff
   ECR_REPOSITORY: bestyle-bff
@@ -101,9 +101,6 @@ jobs:
             SPRING_DATASOURCE_URL=${{ secrets.BFF_DB_URL }}
             SPRING_DATASOURCE_USERNAME=${{ secrets.BFF_DB_USERNAME }}
             SPRING_DATASOURCE_PASSWORD=${{ secrets.BFF_DB_PASSWORD }}
-            SERVICES_USER_URL=${{ secrets.USER_SERVICE_URL }}
-            SERVICES_POST_URL=${{ secrets.POST_SERVICE_URL }}
-            SERVICES_FOLLOW_URL=${{ secrets.FOLLOW_SERVICE_URL }}
             COGNITO_CLIENT_ID=${{ secrets.COGNITO_CLIENT_ID }}
             COGNITO_CLIENT_SECRET=${{ secrets.COGNITO_CLIENT_SECRET }}
             COGNITO_REDIRECT_URI=${{ secrets.COGNITO_REDIRECT_URI }}

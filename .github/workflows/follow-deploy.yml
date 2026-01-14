@@ -18,7 +18,7 @@ on:
 env:
   AWS_REGION: ap-northeast-1
   ECS_SERVICE: bestyle-follow-service
-  ECS_CLUSTER: bestyle-cluster
+  ECS_CLUSTER: fre-style-cluster
   ECS_TASK_DEFINITION: .aws/task-definition-follow.json
   CONTAINER_NAME: bestyle-follow
   ECR_REPOSITORY: bestyle-follow
