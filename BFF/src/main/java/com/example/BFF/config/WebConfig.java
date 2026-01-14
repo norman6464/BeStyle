@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer{
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**") // すべてのパスに対応
             .allowedOrigins(ALLOWED_ORIGINS.toArray(new String[0]))
-            .allowedMethods("GET","POST","PUT","DELETE")
+            .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
             .allowCredentials(true); // Cookieなどの認証情報も許可する場合
   }
   
