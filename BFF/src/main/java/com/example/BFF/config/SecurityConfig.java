@@ -70,10 +70,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // 許可するオリジン
+        // 許可するオリジン（開発環境 + 本番環境）
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:5173",
-            "http://localhost:3000"
+            "http://localhost:3000",
+            "https://normanworld.com"
         ));
         
         // 許可するHTTPメソッド
