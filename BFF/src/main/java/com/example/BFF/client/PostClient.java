@@ -9,7 +9,7 @@ import java.util.Map;
 
 @FeignClient(
     name = "bestyle-post",
-    url = "http://bestyle-post-8080-tcp.bestyle-service-connect:8082"
+    url = "http://bestyle-post-8080-tcp.bestyle-service-connect:8080"
 )
 public interface PostClient {
 

@@ -10,7 +10,7 @@ import java.util.Map;
 
 @FeignClient(
     name = "bestyle-follow",
-    url = "http://bestyle-follow-8080-tcp.bestyle-service-connect:8083"
+    url = "http://bestyle-follow-8080-tcp.bestyle-service-connect:8080"
 )
 public interface FollowClient {
 
