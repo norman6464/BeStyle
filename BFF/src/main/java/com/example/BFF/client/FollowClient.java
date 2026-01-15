@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "follow", url = "${services.follow.url:http://localhost:8083}")
+@FeignClient(name = "follow", url = "${services.follow.url:http://localhost:8080}")
 public interface FollowClient {
 
     @PostMapping("/api/follows")

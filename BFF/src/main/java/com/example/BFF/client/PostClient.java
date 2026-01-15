@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "post", url = "${services.post.url:http://localhost:8082}")
+@FeignClient(name = "post", url = "${services.post.url:http://localhost:8080}")
 public interface PostClient {
 
     @GetMapping("/api/posts/timeline")

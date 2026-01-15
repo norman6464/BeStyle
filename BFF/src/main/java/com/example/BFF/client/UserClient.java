@@ -4,7 +4,7 @@ import com.example.BFF.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "user", url = "${services.user.url:http://localhost:8081}")
+@FeignClient(name = "user", url = "${services.user.url:http://localhost:8080}")
 public interface UserClient {
 
     @GetMapping("/api/users/{id}")
