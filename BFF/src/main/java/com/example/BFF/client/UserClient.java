@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @FeignClient(
     name = "bestyle-user",
-    url = "http://bestyle-user-8080-tcp.bestyle-service-connect:8080"
+    url = "http://bestyle-user-8081-tcp.bestyle-service-connect:8081"
 )
 public interface UserClient {
 
